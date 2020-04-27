@@ -6,12 +6,6 @@ import numpy as np
 import os
 import pandas as pd
 
-uni_data = df['T (degC)']
-uni_data.index = df['Date Time']
-uni_data.head()
-
-uni_data.plot(subplots=True)
-
 uni_data = uni_data.values
 
 uni_train_mean = uni_data[:TRAIN_SPLIT].mean()
@@ -59,10 +53,4 @@ def show_plot(plot_data, delta, title):
   return plt
 
 show_plot([x_train_uni[0], y_train_uni[0]], 0, 'Sample Example')
-
-def baseline(history):
-  return np.mean(history)
-
-show_plot([x_train_uni[0], y_train_uni[0], baseline(x_train_uni[0])], 0,
-           'Baseline Prediction Example')
 
