@@ -25,4 +25,5 @@ uni_data.index = df['Date Time']
 uni_data.head()
 
 uni_data.plot(subplots=True)
+plt.show()
 
