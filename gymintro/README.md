@@ -327,7 +327,7 @@ if __name__ == '__main__':
 
 ![結果](https://github.com/academeia/machine-learning-seminar_2020/blob/images/result.gif "結果")
 
-![報酬合計の推移](https://github.com/academeia/machine-learning-seminar_2020/blob/images/rewards.png　"報酬の推移")
+![報酬合計の推移](https://github.com/academeia/machine-learning-seminar_2020/blob/images/rewards.png "報酬の推移")
 
 
 解説は以上となります．他の環境も是非試してみてください．
