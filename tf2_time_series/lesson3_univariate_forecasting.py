@@ -6,7 +6,7 @@ import numpy as np
 import os
 import pandas as pd
 
-from utils import univariate_data, show_plot, create_time_steps
+from utils import univariate_data, show_plot_with_baseline, create_time_steps
 
 zip_path = tf.keras.utils.get_file(
   origin='https://storage.googleapis.com/tensorflow/tf-keras-datasets/jena_climate_2009_2016.csv.zip',
@@ -65,9 +65,6 @@ simple_lstm_model.fit(train_univariate, epochs=EPOCHS,
 
 
 for x, y in val_univariate.take(3):
-  plot = show_plot([x[0].numpy(), y[0].numpy(),
+  plot = show_plot_with_baseline([x[0].numpy(), y[0].numpy(),
                     simple_lstm_model.predict(x)[0]], 0, 'Simple LSTM model')
   plot.show()
-
-
-
