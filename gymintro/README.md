@@ -15,6 +15,7 @@
   ├── 教師なし学習 (例：クラスタリング，次元削減)
   └── 強化学習 [今回のテーマ]
 ```
+
 強化学習には他の機械学習分野にはない **報酬 (reward)** という概念があり，
 獲得する報酬の期待値を最大にするような **行動 (action)** を決める方策を学習する，
 というのが特徴的です．
@@ -45,6 +46,7 @@ OpenAI Gym とは，人工知能を研究する非営利団体である OpenAI �
 ```
 
 __基本用語__
+
 * **状態 (state)**: システムの状態．
 * **行動 (action)**: エージェントの行動．
 * **報酬 (reward)**: 行動の結果の良し悪しを測る量．数学的には，
@@ -67,13 +69,13 @@ OpenAI Gym は環境周辺のあらゆる機能を提供してくれます．
 ### 1.1. インストール
 Python3 のパッケージ管理ツール pip3 を用いて OpenAI Gym をインストールします．
 
-```
+```bash
 pip3 install gym
 ```
 
 2020年4月30日現在，公開されている OpenAI Gym の最新バージョンは 0.17.1 となっています．
 
-```
+```shell-session
 $ pip3 show gym
 Name: gym
 Version: 0.17.1
@@ -89,43 +91,52 @@ Requires: scipy, cloudpickle, numpy, six, pyglet
 ### 1.2. 環境データ
 まずは環境 (environment) を作成してみましょう．
 `gym.make()` の引数に環境名 (ゲーム名) を渡して，環境インスタンス `env` を生成します．
+
 ```python
 import gym
 env = gym.make('MountainCar-v0')
 ```
 
 生成可能な環境名の一覧を取得するには次のようにしてください．
+
 ```python
 from gym import envs
 for spec in envs.registry.all():
   print(spec.id)
 ```
+
 それぞれの詳細については公式サイトを参照してください．
+
 * OpenAI Gym Environments: [https://gym.openai.com/envs](https://gym.openai.com/envs/)
 
 環境の初期化をするには `reset()` メソッドを実行します．
 この戻り値 `observation` は初期状態における観測データを表しています．
 詳細については次の節で説明します．
+
 ```python
 observation = env.reset()
 ```
 
 現在の環境を描画するには `render()` メソッドを実行してください．
+
 ```python
 env.render()
 ```
+
 すると，次のような山登りゲームの初期状態画面が出力されます．
 
 ![初期状態](https://github.com/academeia/machine-learning-seminar_2020/blob/images/initial_state.png "初期状態")
 
 ### 1.3. 観測データ
 今回の `MountainCar-v0` の場合は次のような配列が観測データとなります．
+
 ```python
 print(observation)
->> [-0.5497433,  0.        ]
+>> [-0.5497433  0.        ]
 ```
 
 観測データの最大値と最小値は次のようにして得られます．
+
 ```python
 # Max
 print(env.observation_space.high)
@@ -134,6 +145,7 @@ print(env.observation_space.high)
 print(env.observation_space.low)
 >> [-1.2  -0.07]
 ```
+
 | 成分 | 0 (車の位置) | 1 (車の速度) |
 |:---:|:----:|:-----:|
 | Max | 0.6  | 0.07  |
@@ -142,6 +154,7 @@ print(env.observation_space.low)
 今回の環境では，車の位置が 0-index, 車の速度が 1-index に格納されます．
 なお，観測データのそれぞれの意味についてはゲーム環境によって異なります．
 詳細については GitHub Wiki を参照してください．
+
 * GitHub Wiki: [https://github.com/openai/gym/wiki](https://github.com/openai/gym/wiki)
 
 ### 1.4. 行動
@@ -157,21 +170,26 @@ print(env.observation_space.low)
 
 なお，行動の値とそれぞれの意味についてはゲーム環境によって異なります．
 詳細については GitHub Wiki を参照してください．
+
 * GitHub Wiki: [https://github.com/openai/gym/wiki](https://github.com/openai/gym/wiki)
 
 それでは，試しに `action=0` としてみましょう．
+
 ```python
 action = 0
 env.step(action) # -> observation, reward, done, info
 ```
+
 すると，4つの戻り値 `observation`, `reward`, `done`, `info` が得られます．
 それぞれの詳細は次の通りです．
+
 * `observation`: 行動 `action` により変化した環境の観測データ
 * `reward`: 行動 `action` による報酬を表す (今回はゴール以外全て `-1.0` で設定)
 * `done`: ゲームが終了したか否かを表す (bool 値)
 * `info`: 詳細情報 (今回は存在しない)
 
 今度は，試しに200回 `action=2` (右へ押す) を連続で実行してみましょう．
+
 ```python
 action = 2
 env.reset()
@@ -198,6 +216,7 @@ for _ in range(200):
 ### 2.2. 実装
 それではQ学習を実装してみましょう．
 まずは必要なモジュールの import とハイパーパラメータを設定します．
+
 ```python
 #!/usr/bin/env python3
 import gym
@@ -211,10 +230,12 @@ epsilon = 0.002 # used in the epsilon-greedy method
 episode_num = 10000 # the number of episodes
 step_num = 200 # the number of steps in one episode
 ```
+
 今回の `MountainCar-v0` では実行できる行動が `A=3` 種類あります．
 
 また，観測データにおける車の位置と速度は連続値であるので，
 実装のためにそれぞれ適当な `N=50` 個の離散値に変換します．
+
 ```python
 # transform observation to status in {0, ..., N-1}
 def get_status(env, observation):
@@ -227,12 +248,14 @@ def get_status(env, observation):
 ```
 
 次に，Q学習におけるQテーブルを初期化します．
+
 ```python
 # initialize q-table
 q_table = np.zeros((N, N, A))
 ```
 
 次に，Qテーブルを更新する関数を定義しましょう．
+
 ```python
 def update_q_table(q_table, action, observation, next_observation, reward):
   # Q(s, a)
@@ -252,6 +275,7 @@ def update_q_table(q_table, action, observation, next_observation, reward):
 次に，epsilon-greedy 法を実装しましょう．
 基本的には価値関数 `Q(s,a)` が最大となる行動を返しますが，
 一定確率 `epsilon` でランダムに行動する点に注意してください．
+
 ```python
 def get_action(env, q_table, observation, epsilon=epsilon):
   if np.random.uniform(0, 1) > epsilon:
@@ -263,6 +287,7 @@ def get_action(env, q_table, observation, epsilon=epsilon):
 ```
 
 最後に，各 episode における学習を実装しましょう．
+
 ```python
 def one_episode(env, q_table, init_observation, rewards, episode):
   # initialization
@@ -293,6 +318,7 @@ def one_episode(env, q_table, init_observation, rewards, episode):
 ```
 
 以上を `__main__` にまとめると次のようになります．
+
 ```python
 if __name__ == '__main__':
   env = gym.make('MountainCar-v0')
