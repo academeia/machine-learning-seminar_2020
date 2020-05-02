@@ -19,6 +19,6 @@ df = pd.read_csv(csv_path)
 
 df.head()
 
-TRAIN_SPLIT = 300000
+#TRAIN_SPLIT = 300000
 
-tf.random.set_seed(13)
+#tf.random.set_seed(13)
