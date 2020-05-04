@@ -447,7 +447,7 @@ def update_q_table(q_table, action, observation, next_observation, reward):
   return q_table
 ```
 
-次に，epsilon-greedy 法を実装しましょう．
+次に，**epsilon-greedy 法** を実装しましょう．
 基本的には価値関数 `Q(s,a)` が最大となる行動を返しますが，
 一定確率 `epsilon` でランダムに行動する点に注意してください．
 
