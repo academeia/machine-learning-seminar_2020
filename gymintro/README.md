@@ -507,11 +507,11 @@ if __name__ == '__main__':
     init_observation = env.reset()
     q_table, rewards = one_episode(env, q_table, init_observation, rewards, episode)
 
+  # initialization
+  observation = env.reset()
+
   # show result of learning
   for _ in range(step_num):
-    # initialization
-    observation = env.reset()
-
     # choose an action by taking argmax of q-table
     action = get_action(env, q_table, observation, epsilon=-1)
 
